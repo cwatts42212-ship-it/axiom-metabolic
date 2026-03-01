@@ -12,6 +12,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@react-router/fs-routes": "^7.12.0",
     "@shopify/hydrogen": "^2025.1.0",
     "chart.js": "^4.5.1",
     "graphql": "^16.10.0",
@@ -20,11 +21,11 @@
     "openai": "^4.86.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router": "^7.1.5",
-    "react-router-dom": "^7.1.5"
+    "react-router": "^7.12.0",
+    "react-router-dom": "^7.12.0"
   },
   "devDependencies": {
-    "@react-router/dev": "^7.1.5",
+    "@react-router/dev": "^7.12.0",
     "@shopify/cli": "^3.71.0",
     "@shopify/mini-oxygen": "^3.0.0",
     "@shopify/oxygen-workers-types": "^4.1.6",
