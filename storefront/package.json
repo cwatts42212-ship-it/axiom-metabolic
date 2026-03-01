@@ -1,0 +1,40 @@
+{
+  "name": "axiom-metabolic",
+  "private": true,
+  "sideEffects": false,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "shopify hydrogen build",
+    "dev": "shopify hydrogen dev",
+    "preview": "shopify hydrogen preview",
+    "lint": "eslint --no-error-on-unmatched-pattern .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@shopify/hydrogen": "^2025.1.0",
+    "chart.js": "^4.5.1",
+    "graphql": "^16.10.0",
+    "graphql-tag": "^2.12.6",
+    "isbot": "^5.1.22",
+    "openai": "^4.86.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router": "^7.1.5",
+    "react-router-dom": "^7.1.5"
+  },
+  "devDependencies": {
+    "@react-router/dev": "^7.1.5",
+    "@shopify/cli": "^3.71.0",
+    "@shopify/mini-oxygen": "^3.0.0",
+    "@shopify/oxygen-workers-types": "^4.1.6",
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.1",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.0",
+    "vite-tsconfig-paths": "^4.3.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

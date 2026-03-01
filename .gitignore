@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Environment variables — NEVER commit these
+.env
+.env.local
+.env.production
+.env.*.local
+storefront/.env
+storefront/.env.local
+storefront/.env.production
+
+# Build outputs
+dist/
+build/
+.cache/
+.hydrogen/
+
+# Shopify Hydrogen / Oxygen
+.oxygen/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# TypeScript
+*.tsbuildinfo
+
+# Credentials reference file (contains raw tokens)
+.env.credentials
+hydrogen-src/

@@ -1,0 +1,131 @@
+/* ============================================================
+   Axiom Metabolic — Account Dashboard Styles
+   ============================================================ */
+
+/* ── Shell & Tabs ── */
+.account-shell {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px 60px;
+  color: var(--ax-text);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.account-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--ax-border);
+  margin-bottom: 28px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-top: 24px;
+}
+
+.account-tabs::-webkit-scrollbar { display: none; }
+
+.account-tab {
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ax-text-muted);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+  margin-bottom: -1px;
+}
+
+.account-tab:hover { color: var(--ax-text); }
+
+.account-tab--active {
+  color: var(--ax-green);
+  border-bottom-color: var(--ax-green);
+}
+
+/* ── Overview ── */
+.account-overview {
+  padding-top: 4px;
+}
+
+.overview-greeting {
+  font-size: clamp(22px, 4vw, 30px);
+  font-weight: 700;
+  color: var(--ax-text);
+  margin: 0 0 24px;
+  letter-spacing: -0.5px;
+}
+
+.overview-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 480px) {
+  .overview-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 900px) {
+  .overview-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+.overview-card {
+  background: var(--ax-surface);
+  border: 1px solid var(--ax-border);
+  border-radius: var(--ax-radius);
+  padding: 22px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.overview-card--cta {
+  background: rgba(16, 185, 129, 0.05);
+  border-color: var(--ax-border-accent);
+}
+
+.overview-card-icon {
+  font-size: 28px;
+  margin-bottom: 4px;
+}
+
+.overview-card h3 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ax-text);
+  margin: 0;
+}
+
+.overview-stat {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--ax-text);
+  margin: 0;
+  line-height: 1;
+}
+
+.overview-sub {
+  font-size: 13px;
+  color: var(--ax-text-muted);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.text-green { color: var(--ax-green); font-weight: 600; }
+
+.overview-link {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ax-green);
+  text-decoration: none;
+  margin-top: auto;
+  padding-top: 8px;
+  transition: color 0.15s;
+}
+
+.overview-link:hover { color: var(--ax-green-light); }
+
+.overview-link--cta {
+  color: var(--ax-green);
+}
