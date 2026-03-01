@@ -12,7 +12,7 @@
  * Food items are added as one-time purchase line items.
  */
 
-import { json, redirect } from "@shopify/hydrogen";
+import { redirect } from "@shopify/hydrogen";
 import type { LoaderFunctionArgs, ActionFunctionArgs } from "@shopify/hydrogen";
 import { useLoaderData, Form, useNavigation, Link } from "react-router";
 import { useState } from "react";
@@ -108,7 +108,7 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
     // Will be created on first purchase attempt
   }
 
-  return json({
+  return Response.json({
     tier,
     foodProducts,
     collections,
@@ -130,11 +130,11 @@ export async function action({ request, context }: ActionFunctionArgs) {
   try {
     selectedVariants = JSON.parse(selectedVariantsJson);
   } catch {
-    return json({ error: "Invalid product selection." }, { status: 400 });
+    return Response.json({ error: "Invalid product selection." }, { status: 400 });
   }
 
   if (!coachingVariantId) {
-    return json(
+    return Response.json(
       { error: "Coaching product not found. Please contact support." },
       { status: 400 }
     );
@@ -142,7 +142,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
 
   const tier = COACHING_TIERS.find((t) => t.id === tierId);
   if (!tier) {
-    return json({ error: "Invalid tier." }, { status: 400 });
+    return Response.json({ error: "Invalid tier." }, { status: 400 });
   }
 
   // Build cart lines
@@ -174,7 +174,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
   const checkoutUrl = result.cart?.checkoutUrl;
 
   if (!checkoutUrl) {
-    return json({ error: "Failed to create cart. Please try again." }, { status: 500 });
+    return Response.json({ error: "Failed to create cart. Please try again." }, { status: 500 });
   }
 
   return redirect(checkoutUrl);

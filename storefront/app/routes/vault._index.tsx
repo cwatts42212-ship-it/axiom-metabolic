@@ -4,7 +4,7 @@
  * Protected: requires customer login
  */
 
-import { json, redirect } from "@shopify/hydrogen";
+import { redirect } from "@shopify/hydrogen";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@shopify/hydrogen";
 import { useLoaderData, useActionData, Form, useNavigation } from "react-router";
 import { getVaultData, logBiometricEntry, getCustomerGidByEmail } from "~/lib/shopify/vault";
@@ -38,7 +38,7 @@ export async function loader({ context }: LoaderFunctionArgs) {
   const goalWeight = vaultData.goalWeight ?? null;
   const toGoal = goalWeight && latestWeight ? latestWeight - goalWeight : null;
 
-  return json({
+  return Response.json({
     firstName,
     email,
     customerGid,
@@ -64,7 +64,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
 
   const customerGid = await getCustomerGidByEmail(email);
   if (!customerGid) {
-    return json({ error: "Could not find your account. Please contact support." }, { status: 400 });
+    return Response.json({ error: "Could not find your account. Please contact support." }, { status: 400 });
   }
 
   if (intent === "log_biometric") {
@@ -95,7 +95,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
       }
     }
 
-    return json({ success: true, message: "Biometrics logged successfully! 💪" });
+    return Response.json({ success: true, message: "Biometrics logged successfully! 💪" });
   }
 
   if (intent === "set_goals") {
@@ -105,10 +105,10 @@ export async function action({ request, context }: ActionFunctionArgs) {
 
     const { saveVaultData } = await import("~/lib/shopify/vault");
     await saveVaultData(customerGid, existing);
-    return json({ success: true, message: "Goals updated!" });
+    return Response.json({ success: true, message: "Goals updated!" });
   }
 
-  return json({ error: "Unknown action" }, { status: 400 });
+  return Response.json({ error: "Unknown action" }, { status: 400 });
 }
 
 export default function VaultDashboard() {

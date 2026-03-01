@@ -12,7 +12,7 @@
  *  - AI Coach data bridge via buildAIVaultSummary()
  */
 
-import { json, redirect } from "@shopify/hydrogen";
+import { redirect } from "@shopify/hydrogen";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@shopify/hydrogen";
 import { useLoaderData, useActionData, Form, useNavigation } from "react-router";
 import {
@@ -80,7 +80,7 @@ export async function loader({ context }: LoaderFunctionArgs) {
   // AI summary (used by coach route)
   const aiSummary = buildAIVaultSummary(vault, `${firstName} ${lastName}`.trim());
 
-  return json({
+  return Response.json({
     firstName,
     email,
     phone,
@@ -127,7 +127,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
 
   const customerGid = await getCustomerGidByEmail(email);
   if (!customerGid) {
-    return json({ error: "Account not found. Please contact support." }, { status: 400 });
+    return Response.json({ error: "Account not found. Please contact support." }, { status: 400 });
   }
 
   // ── Log biometric entry ──
@@ -139,7 +139,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
 
     const weightVal = parseFloat(formData.get("weight") as string);
     if (isNaN(weightVal)) {
-      return json({ error: "Weight is required and must be a valid number." }, { status: 400 });
+      return Response.json({ error: "Weight is required and must be a valid number." }, { status: 400 });
     }
 
     const entry: BiometricEntry = {
@@ -173,7 +173,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
       }
     }
 
-    return json({
+    return Response.json({
       success: true,
       message: `Biometrics logged for ${entry.date}!${newMilestones.length > 0 ? ` 🏆 New milestone: ${newMilestones.join(", ")}!` : ""}`,
       newMilestones,
@@ -196,10 +196,10 @@ export async function action({ request, context }: ActionFunctionArgs) {
     }
 
     await saveVaultData(customerGid, existing);
-    return json({ success: true, message: "Profile & goals updated!" });
+    return Response.json({ success: true, message: "Profile & goals updated!" });
   }
 
-  return json({ error: "Unknown action" }, { status: 400 });
+  return Response.json({ error: "Unknown action" }, { status: 400 });
 }
 
 // ── Component ────────────────────────────────────────────────────────────────

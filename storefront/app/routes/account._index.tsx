@@ -4,7 +4,7 @@
  * Renders the tabbed dashboard: Overview | Progress (Vault) | AI Coach | Orders
  */
 
-import { json, redirect } from "@shopify/hydrogen";
+import { redirect } from "@shopify/hydrogen";
 import type { LoaderFunctionArgs } from "@shopify/hydrogen";
 import { useLoaderData, Link, useLocation } from "react-router";
 import { getVaultData, getCustomerGidByEmail } from "~/lib/shopify/vault";
@@ -21,7 +21,7 @@ export async function loader({ context }: LoaderFunctionArgs) {
   const customerGid = await getCustomerGidByEmail(email);
   const vault = customerGid ? await getVaultData(customerGid) : null;
 
-  return json({
+  return Response.json({
     firstName,
     email,
     hasVaultData: !!vault && (vault.entries?.length ?? 0) > 0,

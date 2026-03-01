@@ -11,7 +11,7 @@
  * All requests must include X-Axiom-Internal header for security.
  */
 
-import { json } from "@shopify/hydrogen";
+
 import type { ActionFunctionArgs } from "@shopify/hydrogen";
 import {
   triggerInactivityAlert,
@@ -25,7 +25,7 @@ export async function action({ request }: ActionFunctionArgs) {
   // Basic internal security check
   const internalHeader = request.headers.get("X-Axiom-Internal");
   if (internalHeader !== process.env.SESSION_SECRET) {
-    return json({ error: "Unauthorized" }, { status: 401 });
+    return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const body = await request.json() as {
@@ -39,7 +39,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const { trigger, email, phone, firstName } = body;
 
   if (!trigger || !email || !firstName) {
-    return json({ error: "Missing required fields: trigger, email, firstName" }, { status: 400 });
+    return Response.json({ error: "Missing required fields: trigger, email, firstName" }, { status: 400 });
   }
 
   try {
@@ -85,13 +85,13 @@ export async function action({ request }: ActionFunctionArgs) {
         break;
 
       default:
-        return json({ error: `Unknown trigger: ${trigger}` }, { status: 400 });
+        return Response.json({ error: `Unknown trigger: ${trigger}` }, { status: 400 });
     }
 
-    return json({ success: true, trigger });
+    return Response.json({ success: true, trigger });
   } catch (err) {
     console.error("[KLAVIYO ROUTE] Error:", err);
-    return json(
+    return Response.json(
       { error: "Klaviyo event failed. Check server logs." },
       { status: 500 }
     );

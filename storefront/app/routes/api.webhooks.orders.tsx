@@ -9,7 +9,7 @@
  *  3. Sends Klaviyo order confirmation SMS
  */
 
-import { json } from "@shopify/hydrogen";
+
 import type { ActionFunctionArgs } from "@shopify/hydrogen";
 import { notifyVendor, parseShopifyOrder } from "~/lib/fulfillment/dropship";
 import { triggerOrderFulfilled } from "~/lib/klaviyo/sms";
@@ -17,7 +17,7 @@ import crypto from "crypto";
 
 export async function action({ request }: ActionFunctionArgs) {
   if (request.method !== "POST") {
-    return json({ error: "Method not allowed" }, { status: 405 });
+    return Response.json({ error: "Method not allowed" }, { status: 405 });
   }
 
   // Verify Shopify HMAC signature
@@ -31,7 +31,7 @@ export async function action({ request }: ActionFunctionArgs) {
       .digest("base64");
 
     if (hash !== hmacHeader) {
-      return json({ error: "Unauthorized" }, { status: 401 });
+      return Response.json({ error: "Unauthorized" }, { status: 401 });
     }
   }
 
@@ -39,7 +39,7 @@ export async function action({ request }: ActionFunctionArgs) {
   try {
     payload = JSON.parse(rawBody) as Record<string, unknown>;
   } catch {
-    return json({ error: "Invalid JSON" }, { status: 400 });
+    return Response.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
   const topic = request.headers.get("X-Shopify-Topic");
@@ -63,13 +63,13 @@ export async function action({ request }: ActionFunctionArgs) {
       }
 
       console.log(`[WEBHOOK] Order ${order.order_number} processed for drop-ship`);
-      return json({ success: true });
+      return Response.json({ success: true });
     } catch (err) {
       console.error("[WEBHOOK] Order processing error:", err);
-      return json({ error: "Processing failed" }, { status: 500 });
+      return Response.json({ error: "Processing failed" }, { status: 500 });
     }
   }
 
   // Acknowledge other topics
-  return json({ received: true });
+  return Response.json({ received: true });
 }

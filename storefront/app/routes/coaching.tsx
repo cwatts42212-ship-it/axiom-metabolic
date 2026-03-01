@@ -12,7 +12,7 @@
  *  - Tier 3: Weekly Zoom ($197/month)
  */
 
-import { json, redirect } from "@shopify/hydrogen";
+import { redirect } from "@shopify/hydrogen";
 import type { LoaderFunctionArgs, ActionFunctionArgs } from "@shopify/hydrogen";
 import { useLoaderData, Form, useNavigation, Link } from "react-router";
 import { shopifyAdminFetch } from "~/lib/shopify/admin-client";
@@ -128,7 +128,7 @@ export async function loader({ context }: LoaderFunctionArgs) {
     // Products not yet created — will be created on first purchase
   }
 
-  return json({ isLoggedIn, coachingProducts, tiers: COACHING_TIERS });
+  return Response.json({ isLoggedIn, coachingProducts, tiers: COACHING_TIERS });
 }
 
 // ── Action ────────────────────────────────────────────────────────────────────
@@ -139,7 +139,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
   const tier = COACHING_TIERS.find((t) => t.id === tierId);
 
   if (!tier) {
-    return json({ error: "Invalid coaching tier selected." }, { status: 400 });
+    return Response.json({ error: "Invalid coaching tier selected." }, { status: 400 });
   }
 
   // Store selected tier in session and redirect to food selection

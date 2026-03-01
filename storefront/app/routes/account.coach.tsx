@@ -10,7 +10,7 @@
  * a human-review notification is logged.
  */
 
-import { json, redirect } from "@shopify/hydrogen";
+import { redirect } from "@shopify/hydrogen";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@shopify/hydrogen";
 import { useLoaderData, useActionData, Form, useNavigation } from "react-router";
 import { useRef, useEffect, useState } from "react";
@@ -36,7 +36,7 @@ export async function loader({ context }: LoaderFunctionArgs) {
     ? buildAIVaultSummary(vault, `${firstName} ${lastName}`.trim())
     : null;
 
-  return json({
+  return Response.json({
     firstName,
     email,
     customerGid,
@@ -64,7 +64,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
   const vaultSummary = (formData.get("vaultSummary") as string) || undefined;
 
   if (!userMessage) {
-    return json({ error: "Message cannot be empty." }, { status: 400 });
+    return Response.json({ error: "Message cannot be empty." }, { status: 400 });
   }
 
   const customer = await customerAccount.get();
@@ -114,14 +114,14 @@ export async function action({ request, context }: ActionFunctionArgs) {
       }
     }
 
-    return json({
+    return Response.json({
       reply: response.message,
       threadId: response.threadId,
       escalated: response.escalate,
     });
   } catch (err) {
     console.error("AI Coach error:", err);
-    return json(
+    return Response.json(
       { error: "The coach is temporarily unavailable. Please try again in a moment." },
       { status: 500 }
     );

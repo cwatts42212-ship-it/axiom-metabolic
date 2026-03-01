@@ -11,7 +11,7 @@
  * POST /api/vault           — log a biometric entry (used by native app or integrations)
  */
 
-import { json } from "@shopify/hydrogen";
+
 import type { LoaderFunctionArgs, ActionFunctionArgs } from "@shopify/hydrogen";
 import {
   getVaultData,
@@ -26,22 +26,22 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const email = url.searchParams.get("email");
 
   if (!email) {
-    return json({ error: "email parameter required" }, { status: 400 });
+    return Response.json({ error: "email parameter required" }, { status: 400 });
   }
 
   const customerGid = await getCustomerGidByEmail(email);
   if (!customerGid) {
-    return json({ error: "Customer not found" }, { status: 404 });
+    return Response.json({ error: "Customer not found" }, { status: 404 });
   }
 
   const vault = await getVaultData(customerGid);
   if (!vault) {
-    return json({ vault: null, aiSummary: "No biometric data logged yet." });
+    return Response.json({ vault: null, aiSummary: "No biometric data logged yet." });
   }
 
   const aiSummary = buildAIVaultSummary(vault, email);
 
-  return json({
+  return Response.json({
     vault,
     aiSummary,
     stats: {
@@ -59,24 +59,24 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export async function action({ request }: ActionFunctionArgs) {
   if (request.method !== "POST") {
-    return json({ error: "Method not allowed" }, { status: 405 });
+    return Response.json({ error: "Method not allowed" }, { status: 405 });
   }
 
   const body = (await request.json()) as { email: string; entry: BiometricEntry };
   const { email, entry } = body;
 
   if (!email || !entry?.weight || !entry?.date) {
-    return json({ error: "email, entry.date, and entry.weight are required" }, { status: 400 });
+    return Response.json({ error: "email, entry.date, and entry.weight are required" }, { status: 400 });
   }
 
   const customerGid = await getCustomerGidByEmail(email);
   if (!customerGid) {
-    return json({ error: "Customer not found" }, { status: 404 });
+    return Response.json({ error: "Customer not found" }, { status: 404 });
   }
 
   const { vault, newMilestones } = await logBiometricEntry(customerGid, entry);
 
-  return json({
+  return Response.json({
     success: true,
     newMilestones,
     entryCount: vault.entries.length,
