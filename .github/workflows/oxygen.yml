@@ -70,23 +70,15 @@ jobs:
         with:
           path: storefront
           token: ${{ secrets.SHOPIFY_HYDROGEN_DEPLOYMENT_TOKEN }}
-          metadata:
-            description: Axiom Metabolic — ${{ github.event.head_commit.message || 'PR Preview' }}
-            url: ${{ github.event.head_commit.url || github.event.pull_request.html_url }}
-            user: ${{ github.event.head_commit.author.name || github.actor }}
-            commit: ${{ github.sha }}
 
       - name: Comment PR with preview URL
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && steps.deploy.outputs.url != ''
         uses: actions/github-script@v7
         with:
           script: |
-            const previewUrl = '${{ steps.deploy.outputs.url }}';
-            if (previewUrl) {
-              github.rest.issues.createComment({
-                issue_number: context.issue.number,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                body: `🚀 **Axiom Metabolic Preview Deployment**\n\nYour changes are live at: ${previewUrl}`
-              });
-            }
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '🚀 **Axiom Metabolic Preview Deployment**\n\nYour changes are live at: ${{ steps.deploy.outputs.url }}'
+            })
