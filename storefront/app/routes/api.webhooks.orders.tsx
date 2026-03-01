@@ -13,24 +13,41 @@
 import type { ActionFunctionArgs } from 'react-router';
 import { notifyVendor, parseShopifyOrder } from "~/lib/fulfillment/dropship";
 import { triggerOrderFulfilled } from "~/lib/klaviyo/sms";
-import crypto from "crypto";
+// Web Crypto API helper for Cloudflare Workers / Oxygen runtime
+async function verifyShopifyHmac(
+  secret: string,
+  body: string,
+  hmacHeader: string
+): Promise<boolean> {
+  const encoder = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    "raw",
+    encoder.encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
+  const signature = await crypto.subtle.sign("HMAC", key, encoder.encode(body));
+  const computed = btoa(String.fromCharCode(...new Uint8Array(signature)));
+  return computed === hmacHeader;
+}
 
 export async function action({ request }: ActionFunctionArgs) {
   if (request.method !== "POST") {
     return Response.json({ error: "Method not allowed" }, { status: 405 });
   }
 
-  // Verify Shopify HMAC signature
+  // Verify Shopify HMAC signature using Web Crypto API
   const hmacHeader = request.headers.get("X-Shopify-Hmac-Sha256");
   const rawBody = await request.text();
 
   if (hmacHeader && process.env.SHOPIFY_WEBHOOK_SECRET) {
-    const hash = crypto
-      .createHmac("sha256", process.env.SHOPIFY_WEBHOOK_SECRET)
-      .update(rawBody, "utf8")
-      .digest("base64");
-
-    if (hash !== hmacHeader) {
+    const isValid = await verifyShopifyHmac(
+      process.env.SHOPIFY_WEBHOOK_SECRET,
+      rawBody,
+      hmacHeader
+    );
+    if (!isValid) {
       return Response.json({ error: "Unauthorized" }, { status: 401 });
     }
   }
