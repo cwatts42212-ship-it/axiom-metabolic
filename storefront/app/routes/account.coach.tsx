@@ -15,7 +15,7 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from 'react-router';
 import { useLoaderData, useActionData, Form, useNavigation } from "react-router";
 import { useRef, useEffect, useState } from "react";
 import { getVaultData, getCustomerGidByEmail, buildAIVaultSummary } from "~/lib/shopify/vault";
-import { sendCoachMessage } from "~/lib/openai/coach";
+import { sendCoachMessage, detectMaintenanceMode } from "~/lib/openai/coach";
 import { trackEvent } from "~/lib/klaviyo/sms";
 
 // ── Loader ───────────────────────────────────────────────────────────────────
@@ -36,6 +36,13 @@ export async function loader({ context }: LoaderFunctionArgs) {
     ? buildAIVaultSummary(vault, `${firstName} ${lastName}`.trim())
     : null;
 
+  const latestWeight = vault?.entries?.[0]?.weight ?? null;
+  const goalWeight = vault?.goalWeight ?? null;
+  const isMaintenanceMode =
+    goalWeight !== null && latestWeight !== null
+      ? latestWeight <= goalWeight
+      : detectMaintenanceMode(aiSummary ?? undefined);
+
   return Response.json({
     firstName,
     email,
@@ -43,10 +50,12 @@ export async function loader({ context }: LoaderFunctionArgs) {
     hasVaultData: !!vault && (vault.entries?.length ?? 0) > 0,
     aiSummary,
     coachingTier: vault?.coachingTier ?? "ai-only",
-    latestWeight: vault?.entries?.[0]?.weight ?? null,
+    latestWeight,
+    goalWeight,
+    isMaintenanceMode,
     totalLost:
-      vault?.startWeight && vault?.entries?.[0]?.weight
-        ? parseFloat((vault.startWeight - vault.entries[0].weight).toFixed(1))
+      vault?.startWeight && latestWeight
+        ? parseFloat((vault.startWeight - latestWeight).toFixed(1))
         : null,
   });
 }
@@ -62,6 +71,10 @@ export async function action({ request, context }: ActionFunctionArgs) {
   const userMessage = (formData.get("message") as string)?.trim();
   const threadId = (formData.get("threadId") as string) || undefined;
   const vaultSummary = (formData.get("vaultSummary") as string) || undefined;
+  const goalWeightRaw = formData.get("goalWeight") as string;
+  const currentWeightRaw = formData.get("currentWeight") as string;
+  const goalWeight = goalWeightRaw ? parseFloat(goalWeightRaw) : undefined;
+  const currentWeight = currentWeightRaw ? parseFloat(currentWeightRaw) : undefined;
 
   if (!userMessage) {
     return Response.json({ error: "Message cannot be empty." }, { status: 400 });
@@ -75,7 +88,9 @@ export async function action({ request, context }: ActionFunctionArgs) {
       userMessage,
       threadId,
       customerName: firstName,
-      vaultSummary: !threadId ? vaultSummary : undefined, // only inject on first message
+      vaultSummary: !threadId ? vaultSummary : undefined,
+      goalWeight: !threadId ? goalWeight : undefined,
+      currentWeight: !threadId ? currentWeight : undefined,
     });
 
     // Log escalation and fire Klaviyo event for human coach review
@@ -137,7 +152,7 @@ interface ChatMessage {
 }
 
 export default function CoachChat() {
-  const { firstName, hasVaultData, aiSummary, coachingTier, latestWeight, totalLost } =
+  const { firstName, hasVaultData, aiSummary, coachingTier, latestWeight, goalWeight, isMaintenanceMode, totalLost } =
     useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const navigation = useNavigation();
@@ -146,11 +161,13 @@ export default function CoachChat() {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: "assistant",
-      content: `Hey ${firstName}! I'm your Axiom Metabolic AI Coach. ${
-        hasVaultData
-          ? `I can see your latest data — you're currently at ${latestWeight} lbs${totalLost ? ` and you've lost ${totalLost} lbs total. That's real progress!` : "."}`
-          : "I don't see any biometrics logged yet — head to the Progress tab to log your first entry so I can give you personalized coaching."
-      } What can I help you with today?`,
+      content: isMaintenanceMode
+        ? `Welcome back, ${firstName}! 🎉 You've reached your goal weight — this is the Lead Nutrition Coach. We're now in Maintenance Mode, focused on Metabolic Flexibility and keeping you there permanently. What's on your mind today?`
+        : `Hey ${firstName}! This is your Lead Nutrition Coach at Axiom Metabolic. ${
+            hasVaultData
+              ? `I can see your latest data — you're currently at ${latestWeight} lbs${totalLost ? ` and you've lost ${totalLost} lbs total. That's real progress — let's keep building on it!` : "."}`
+              : "I don't see any biometrics logged yet — head to the Progress tab to log your first entry so I can give you personalized coaching."
+          } What can I help you with today?`,
     },
   ]);
   const [threadId, setThreadId] = useState<string | undefined>(undefined);
@@ -262,6 +279,8 @@ export default function CoachChat() {
       <Form method="post" className="chat-input-form" onSubmit={handleSubmit}>
         <input type="hidden" name="threadId" value={threadId ?? ""} />
         <input type="hidden" name="vaultSummary" value={aiSummary ?? ""} />
+        <input type="hidden" name="goalWeight" value={goalWeight ?? ""} />
+        <input type="hidden" name="currentWeight" value={latestWeight ?? ""} />
         <div className="chat-input-row">
           <textarea
             ref={inputRef}
