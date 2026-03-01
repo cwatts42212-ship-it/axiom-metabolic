@@ -10,8 +10,8 @@
  * a human-review notification is logged.
  */
 
-import { redirect } from "@shopify/hydrogen";
-import type { ActionFunctionArgs, LoaderFunctionArgs } from "@shopify/hydrogen";
+import { redirect } from 'react-router';
+import type { ActionFunctionArgs, LoaderFunctionArgs } from 'react-router';
 import { useLoaderData, useActionData, Form, useNavigation } from "react-router";
 import { useRef, useEffect, useState } from "react";
 import { getVaultData, getCustomerGidByEmail, buildAIVaultSummary } from "~/lib/shopify/vault";

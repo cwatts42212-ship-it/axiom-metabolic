@@ -12,8 +12,8 @@
  *  - Tier 3: Weekly Zoom ($197/month)
  */
 
-import { redirect } from "@shopify/hydrogen";
-import type { LoaderFunctionArgs, ActionFunctionArgs } from "@shopify/hydrogen";
+import { redirect } from 'react-router';
+import type { ActionFunctionArgs, LoaderFunctionArgs } from 'react-router';
 import { useLoaderData, Form, useNavigation, Link } from "react-router";
 import { shopifyAdminFetch } from "~/lib/shopify/admin-client";
 

@@ -10,7 +10,7 @@
  */
 
 
-import type { ActionFunctionArgs } from "@shopify/hydrogen";
+import type { ActionFunctionArgs } from 'react-router';
 import { notifyVendor, parseShopifyOrder } from "~/lib/fulfillment/dropship";
 import { triggerOrderFulfilled } from "~/lib/klaviyo/sms";
 import crypto from "crypto";

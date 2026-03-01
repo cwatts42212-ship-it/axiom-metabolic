@@ -12,7 +12,7 @@
  */
 
 
-import type { ActionFunctionArgs } from "@shopify/hydrogen";
+import type { ActionFunctionArgs } from 'react-router';
 import {
   triggerInactivityAlert,
   triggerMilestoneCelebration,

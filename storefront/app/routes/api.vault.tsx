@@ -12,7 +12,7 @@
  */
 
 
-import type { LoaderFunctionArgs, ActionFunctionArgs } from "@shopify/hydrogen";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from 'react-router';
 import {
   getVaultData,
   logBiometricEntry,

@@ -12,8 +12,8 @@
  * Food items are added as one-time purchase line items.
  */
 
-import { redirect } from "@shopify/hydrogen";
-import type { LoaderFunctionArgs, ActionFunctionArgs } from "@shopify/hydrogen";
+import { redirect } from 'react-router';
+import type { ActionFunctionArgs, LoaderFunctionArgs } from 'react-router';
 import { useLoaderData, Form, useNavigation, Link } from "react-router";
 import { useState } from "react";
 import { COACHING_TIERS } from "./coaching";

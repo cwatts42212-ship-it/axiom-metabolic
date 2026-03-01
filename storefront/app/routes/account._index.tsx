@@ -4,8 +4,8 @@
  * Renders the tabbed dashboard: Overview | Progress (Vault) | AI Coach | Orders
  */
 
-import { redirect } from "@shopify/hydrogen";
-import type { LoaderFunctionArgs } from "@shopify/hydrogen";
+import { redirect } from 'react-router';
+import type { LoaderFunctionArgs } from 'react-router';
 import { useLoaderData, Link, useLocation } from "react-router";
 import { getVaultData, getCustomerGidByEmail } from "~/lib/shopify/vault";
 
